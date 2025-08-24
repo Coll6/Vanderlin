@@ -14,3 +14,36 @@
 /datum/component/storage/concrete/scabbard/sword/New(list/raw_args)
 	. = ..()
 	set_holdable(list(/obj/item/weapon/sword), list(/obj/item/weapon/sword/long/exe, /obj/item/weapon/sword/long/greatsword))
+
+/datum/component/storage/concrete/boots
+	max_items = 1
+	rustle_sound = 'sound/foley/equip/scabbard_holster.ogg'
+	max_w_class = WEIGHT_CLASS_SMALL
+	quickdraw = TRUE
+	allow_look_inside = FALSE
+	insert_verb = "slide"
+	insert_preposition = "in"
+
+/datum/component/storage/concrete/boots/New(list/raw_args)
+	. = ..()
+	set_holdable(list(/obj/item/weapon/knife, /obj/item/coin, /obj/item/key))
+
+/datum/component/storage/concrete/boots/attackby(datum/source, obj/item/attacking_item, mob/user, params, storage_click)
+	if(isatom(parent) && can_be_inserted(obj/item/attacking_item, stop_messages = TRUE, mob/user))
+		var/atom/boots = parent
+		if(istype(attacking_item, /obj/item/weapon/knife) && istype(boots?.loc, /mob/living/carbon/human))
+			var/mob/living/carbon/human/unlucky = boots.loc
+			if(unlucky.shoes == parent && prob(40 - (unlucky.STALUC * 4)))
+				var/cached_aim = user.zone_selected
+				user.zone_selected = pick(BODY_ZONE_PRECISE_R_FOOT, BODY_ZONE_PRECISE_L_FOOT)
+				unlucky.attackby(attacking_item, user, params)
+				unlucky.to_chat("<span class='danger'>UNLUCKY! I've stabbed myself with the [attacking_item]!</span>")
+				user.zone_selected = cached_aim
+
+	return ..()
+
+/datum/component/storage/concrete/boots/handle_item_insertion(obj/item/I, prevent_warning, mob/M, datum/component/storage/remote, params, storage_click)
+	. = ..()
+
+	if(!.)
+		return
