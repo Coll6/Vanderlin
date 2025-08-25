@@ -28,6 +28,16 @@
 	. = ..()
 	set_holdable(list(/obj/item/weapon/knife, /obj/item/coin, /obj/item/key))
 
+/datum/component/storage/concrete/boots/Initialize(datum/component/storage/concrete/master)
+	. = ..()
+	RegisterSignal(parent, COMSIG_ITEM_EQUIPPED, PROC_REF(equipped_stress))
+	RegisterSignal(parent, COMSIG_ITEM_DROPPED, PROC_REF(unequipped_stress))
+
+/datum/component/storage/concrete/boots/Destroy(force)
+	UnregisterSignal(parent, COMSIG_ITEM_EQUIPPED)
+	UnregisterSignal(parent, COMSIG_ITEM_DROPPED)
+	return ..()
+
 /datum/component/storage/concrete/boots/attackby(datum/source, obj/item/attacking_item, mob/user, params, storage_click)
 	if(isatom(parent) && can_be_inserted(attacking_item, stop_messages = TRUE))
 		var/atom/boots = parent
@@ -61,7 +71,7 @@
 	var/atom/boots = parent
 	if(istype(boots?.loc, /mob/living/carbon/human))
 		var/mob/living/carbon/human/uncomfy = boots.loc
-		if(istype(uncomfy) && (uncomfy.shoes != parent))
+		if(!istype(uncomfy) || (uncomfy.shoes != parent))
 			return
 		var/atom/real_location = src.real_location()
 		if(length(real_location.contents))
@@ -74,3 +84,23 @@
 				return
 		uncomfy.remove_stress(/datum/stressevent/fullshoe)
 		return
+
+/datum/component/storage/concrete/boots/proc/equipped_stress(datum/source, mob/user, slot)
+	if(slot != ITEM_SLOT_SHOES)
+		return
+
+	var/atom/real_location = real_location()
+	var/atom/boots = parent
+	if(length(real_location.contents))
+		var/list/irritants = list()
+		for(var/obj/item/I in real_location.contents)
+			if(!istype(I, /obj/item/weapon/knife))
+				irritants |= I
+		if(length(irritants) && istype(boots?.loc, /mob/living/carbon))
+			var/mob/living/carbon/wearer = user
+			wearer.add_stress(/datum/stressevent/fullshoe)
+
+/datum/component/storage/concrete/boots/proc/unequipped_stress(datum/source, mob/living/carbon/user)
+	if(!istype(user) || (user.shoes != parent) )
+		return
+	user.remove_stress(/datum/stressevent/fullshoe)
