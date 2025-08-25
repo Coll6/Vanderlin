@@ -15,6 +15,35 @@
 	. = ..()
 	AddComponent(/datum/component/storage/concrete/boots)
 
+/obj/item/clothing/shoes/nobleboot/Destroy()
+	if(istype(src.loc, /mob/living/carbon))
+		var/mob/living/carbon/wearer = src.loc
+		wearer.remove_stress(/datum/stressevent/fullshoe)
+	return ..()
+
+/obj/item/clothing/shoes/nobleboot/equipped(mob/user, slot)
+	. = ..()
+
+	if(slot != ITEM_SLOT_SHOES)
+		return
+
+	var/datum/component/storage/concrete/boots/myboots = src.GetComponent(/datum/component/storage/concrete/boots)
+	var/atom/real_location = myboots.real_location()
+	if(length(real_location.contents))
+		var/list/irritants = list()
+		for(var/obj/item/I in real_location.contents)
+			if(!istype(I, /obj/item/weapon/knife))
+				irritants |= I
+		if(length(irritants) && istype(src.loc, /mob/living/carbon))
+			var/mob/living/carbon/wearer = user
+			wearer.add_stress(/datum/stressevent/fullshoe)
+
+/obj/item/clothing/shoes/nobleboot/dropped(mob/user)
+	if(istype(user, /mob/living/carbon))
+		var/mob/living/carbon/wearer = user
+		wearer.remove_stress(/datum/stressevent/fullshoe)
+	return ..()
+
 /obj/item/clothing/shoes/nobleboot/thighboots
 	name = "thigh boots"
 	icon_state = "thighboot"

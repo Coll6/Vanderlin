@@ -29,7 +29,7 @@
 	set_holdable(list(/obj/item/weapon/knife, /obj/item/coin, /obj/item/key))
 
 /datum/component/storage/concrete/boots/attackby(datum/source, obj/item/attacking_item, mob/user, params, storage_click)
-	if(isatom(parent) && can_be_inserted(obj/item/attacking_item, stop_messages = TRUE, mob/user))
+	if(isatom(parent) && can_be_inserted(attacking_item, stop_messages = TRUE))
 		var/atom/boots = parent
 		if(istype(attacking_item, /obj/item/weapon/knife) && istype(boots?.loc, /mob/living/carbon/human))
 			var/mob/living/carbon/human/unlucky = boots.loc
@@ -37,7 +37,7 @@
 				var/cached_aim = user.zone_selected
 				user.zone_selected = pick(BODY_ZONE_PRECISE_R_FOOT, BODY_ZONE_PRECISE_L_FOOT)
 				unlucky.attackby(attacking_item, user, params)
-				unlucky.to_chat("<span class='danger'>UNLUCKY! I've stabbed myself with the [attacking_item]!</span>")
+				to_chat(unlucky, "<span class='danger'>UNLUCKY! I've stabbed myself with the [attacking_item]!</span>")
 				user.zone_selected = cached_aim
 
 	return ..()
@@ -45,5 +45,32 @@
 /datum/component/storage/concrete/boots/handle_item_insertion(obj/item/I, prevent_warning, mob/M, datum/component/storage/remote, params, storage_click)
 	. = ..()
 
-	if(!.)
+	if(!istype(I, /obj/item/weapon/knife) && isatom(parent))
+		var/obj/item/clothing/shoes/boots = parent
+		if(!.)
+			return
+		if(istype(boots?.loc, /mob/living/carbon/human))
+			var/mob/living/carbon/human/uncomfy = boots.loc
+			if(uncomfy.shoes != parent)
+				return
+			uncomfy.add_stress(/datum/stressevent/fullshoe)
+
+/datum/component/storage/concrete/boots/remove_from_storage(atom/movable/removed, atom/new_location)
+	. = ..()
+
+	var/atom/boots = parent
+	if(istype(boots?.loc, /mob/living/carbon/human))
+		var/mob/living/carbon/human/uncomfy = boots.loc
+		if(istype(uncomfy) && (uncomfy.shoes != parent))
+			return
+		var/atom/real_location = src.real_location()
+		if(length(real_location.contents))
+			var/list/irritants = list()
+			for(var/obj/item/I in real_location.contents)
+				if(!istype(I, /obj/item/weapon/knife))
+					irritants |= I
+			if(length(irritants))
+				uncomfy.add_stress(/datum/stressevent/fullshoe)
+				return
+		uncomfy.remove_stress(/datum/stressevent/fullshoe)
 		return

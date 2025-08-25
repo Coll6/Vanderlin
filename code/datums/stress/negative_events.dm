@@ -121,6 +121,10 @@
 	stressadd = 1
 //	desc = "<span class='red'>I fell. I'm a fool.</span>"
 
+/datum/stressevent/fullshoe
+	stressadd = 1
+	desc = "<span class='red'>There is something in my shoe.</span>"
+
 /datum/stressevent/uncookedfood
 	timer = 2 MINUTES
 	stressadd = 2
