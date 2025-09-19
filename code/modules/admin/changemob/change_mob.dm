@@ -1,5 +1,4 @@
 /datum/cchange_mob_panel
-	//var/user_ckey
 	var/mob/living/cached_body
 	var/client/cached_client
 
@@ -45,17 +44,13 @@
 	..()
 	RegisterSignal(user, COMSIG_MOB_LOGOUT, PROC_REF(closewindow))
 
-/datum/browser/extra/proc/transferclosewindow()
-	SIGNAL_HANDLER
-	UnregisterSignal(user, COMSIG_MOB_LOGOUT)
-	//UnregisterSignal(user, COMSIG_MOB_MIND_TRANSFERRED_OUT_OF)
-
 /datum/browser/extra/proc/closewindow()
 	SIGNAL_HANDLER
+
+	if(!user.ckey && user.mind?.key)
+		var/mob/ckeyuser = get_mob_by_ckey(user.mind?.key)
+		ckeyuser << browse(null, "window=[window_id]")
+
 	UnregisterSignal(user, COMSIG_MOB_LOGOUT)
-	//UnregisterSignal(user, COMSIG_MOB_MIND_TRANSFERRED_OUT_OF)
-	//var/datum/mind/user_mind = user.mind
-	//if(user)
-
-
-	//user << browse(null, "window=[window_id]")
+	qdel(owner)
+	close()
