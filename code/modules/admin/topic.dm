@@ -1282,6 +1282,17 @@
 		var/client/mob_client = M.client
 		role_ban_panel.show_ui(usr, mob_client.key)
 
+	else if(href_list["complexchangemobpanel"])
+		if(!check_rights(R_ADMIN))
+			return
+		var/mob/Mob = locate(href_list["complexchangemobpanel"]) in GLOB.mob_list
+		if(!Mob)
+			to_chat(usr, "That mob no longer exists.")
+			return
+		var/client/mob_client = Mob.client
+		var/datum/cchange_mob_panel/panel = new(Mob, mob_client)
+		panel.show_ui(usr)
+
 	else if(href_list["slowquery"])
 		if(!check_rights(R_ADMIN))
 			return

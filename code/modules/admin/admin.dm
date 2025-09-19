@@ -164,6 +164,8 @@
 	if(M.client)
 		body += "\ <A href='?_src_=holder;[HrefToken()];sendbacktolobby=[REF(M)]'>Send back to Lobby</A> | "
 		body += "<A href='?_src_=holder;[HrefToken()];cryomob=[REF(M)]'>CRYO</A>"
+		if(ishuman(M))
+			body += " | <A href='?_src_=holder;[HrefToken()];complexchangemobpanel=[REF(M)]'>Change Mob</A>"
 		var/muted = M.client.prefs.muted
 		body += "<br><b>Mute: </b> "
 		body += "\[<A href='?_src_=holder;[HrefToken()];mute=[M.ckey];mute_type=[MUTE_IC]'><font color='[(muted & MUTE_IC)?"red":"blue"]'>IC</font></a> | "
