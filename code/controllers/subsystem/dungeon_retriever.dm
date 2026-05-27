@@ -7,7 +7,7 @@ SUBSYSTEM_DEF(dungeon_retriever)
 	var/list/dungeon_deaths = list() // The unfortunate fallen to the dungeon.
 
 /datum/controller/subsystem/dungeon_retriever/Initialize(start_timeofday)
-	if(SSdungeon_generator.initialized)
+	if(SSdungeon_generator.initialized || length(dungeon_deaths))
 		record_deaths = TRUE
 		RegisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH, PROC_REF(record_dungeon_death))
 
@@ -17,3 +17,10 @@ SUBSYSTEM_DEF(dungeon_retriever)
 	SIGNAL_HANDLER
 	if(!gibbed && ishuman(mob) && istype(get_area(mob), /area/under/tomb))
 		dungeon_deaths += mob
+
+/datum/controller/subsystem/dungeon_retriever/Recover()
+	UnregisterSignal(SSdungeon_retriever, COMSIG_GLOB_MOB_DEATH)
+	if(length(SSdungeon_retriever.dungeon_deaths))
+		dungeon_deaths = SSdungeon_retriever.dungeon_deaths
+
+ //TODO handle revives on living revive SEND_SIGNAL(src, COMSIG_LIVING_REVIVE, full_heal_flags)
