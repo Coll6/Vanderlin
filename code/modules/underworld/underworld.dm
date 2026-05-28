@@ -199,3 +199,17 @@
 		for(var/mob/living/carbon/human/A in view(4))
 			to_chat(A, "The monster's form dematerializes as it nears the Carriage.")
 		qdel(AM)
+
+/obj/item/underworld/kharon_coin
+	name = "Obol of Return"
+	desc = "A worn obol kept by Tomb Wardens for the inevitable dead. KHARON answers its mark."
+	icon = 'icons/roguetown/underworld/enigma_husks.dmi'
+	icon_state = "soultoken_floor"
+
+/obj/item/underworld/kharon_coin/pickup(mob/user)
+	..()
+	icon_state = "soultoken"
+
+/obj/item/underworld/kharon_coin/dropped(mob/user)
+	..()
+	icon_state = "soultoken_floor"

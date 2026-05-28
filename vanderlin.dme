@@ -2104,6 +2104,7 @@
 #include "code\game\objects\structures\fake_machines\storage.dm"
 #include "code\game\objects\structures\fake_machines\submission.dm"
 #include "code\game\objects\structures\fake_machines\titan.dm"
+#include "code\game\objects\structures\fake_machines\tomb_retrieval.dm"
 #include "code\game\objects\structures\fake_machines\vendor.dm"
 #include "code\game\objects\structures\metallurgy\metal_channels.dm"
 #include "code\game\objects\structures\metallurgy\metal_connectors\_base.dm"
