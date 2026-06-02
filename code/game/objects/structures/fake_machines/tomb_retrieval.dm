@@ -54,7 +54,9 @@
 		if(!istype(corpse))
 			return
 		var/result = retriever.attempt_retrieval(corpse, get_turf(usr))
-		return
+		return attack_hand(usr)
+
+
 	if(href_list["eject"])
 		//TODO EJECT ALL COINS
-		return
+		return attack_hand(usr)
