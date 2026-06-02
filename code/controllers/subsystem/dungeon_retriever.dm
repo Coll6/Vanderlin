@@ -14,17 +14,28 @@ SUBSYSTEM_DEF(dungeon_retriever)
 	return ..()
 
 /datum/controller/subsystem/dungeon_retriever/Recover()
-	UnregisterSignal(SSdungeon_retriever, COMSIG_GLOB_MOB_DEATH)
+	UnregisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH)
 	if(length(SSdungeon_retriever.dungeon_deaths))
 		dungeon_deaths = SSdungeon_retriever.dungeon_deaths
 
 /datum/controller/subsystem/dungeon_retriever/proc/record_dungeon_death(source, mob, gibbed)
 	SIGNAL_HANDLER
+	if(isnull(dungeon_deaths))
+		dungeon_deaths = list()
 	if(!gibbed && ishuman(mob) && istype(get_area(mob), /area/under/tomb))
 		dungeon_deaths += mob
 
-/datum/controller/subsystem/dungeon_retriever/proc/attempt_retrieval()
+/datum/controller/subsystem/dungeon_retriever/proc/attempt_retrieval(mob/living/carbon/human/corpse, turf/destination)
+	//TODO ADD CHECKS FOR VALID CORPSES
+	if(!istype(corpse))
+		return FALSE
+	if(!istype(destination))
+		return FALSE
+	if(!(corpse in dungeon_deaths))
+		return FALSE
+	return retrieve_body(corpse, destination)
 
-/datum/controller/subsystem/dungeon_retriever/proc/retrieve_body()
-
+/datum/controller/subsystem/dungeon_retriever/proc/retrieve_body(mob/living/carbon/human/corpse, turf/destination)
+	dungeon_deaths -= corpse
+	corpse.forceMove(destination)
  //TODO handle revives on living revive SEND_SIGNAL(src, COMSIG_LIVING_REVIVE, full_heal_flags)
