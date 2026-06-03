@@ -30,7 +30,7 @@
 /obj/structure/fake_machine/tomb_retrieval/proc/get_retrieval_subjects()
 	var/contents = "<center>TOMB'S VICTIMS<BR>"
 	contents += "--------------<BR>"
-	var/list/recorded_deaths = (SSdungeon_retriever?.initialized && SSdungeon_retriever.record_deaths) ? SSdungeon_retriever.dungeon_deaths : list()
+	var/list/recorded_deaths = (SSdungeon_retriever?.initialized && SSdungeon_retriever.record_deaths) ? SSdungeon_retriever.retrieve_record() : list()
 
 	if(length(recorded_deaths))
 		contents += "The following unfortunate souls have perished in the dungeon. Whom to ferry back?</center><BR>"
@@ -52,8 +52,8 @@
 		//TODO CHECK IF THERE IS ENOUGH COINS
 		var/mob/living/carbon/human/corpse = locate(href_list["retrieve"])
 		if(!istype(corpse))
-			return
-		var/result = retriever.attempt_retrieval(corpse, get_turf(usr))
+			return attack_hand(usr)
+		retriever.attempt_retrieval(corpse, get_turf(usr))
 		return attack_hand(usr)
 
 
